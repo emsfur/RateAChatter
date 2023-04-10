@@ -1,7 +1,7 @@
 import streamlit as st
 import plotly.express as px
 
-defArgs = ['funny', 'annoying', 'bannable', 'cringe','gilf worthy',  'interesting']
+defArgs = ['funny', 'annoying', 'bannable', 'cringe', 'nice',  'interesting']
 
 # initialize items
 for i in range(6):

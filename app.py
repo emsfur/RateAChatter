@@ -1,52 +1,50 @@
 import streamlit as st
 import plotly.express as px
 
+defArgs = ['funny', 'annoying', 'bannable', 'cringe','gilf worthy',  'interesting']
 
-arg1 = 'funny'
-arg2 = 'annoying'
-arg3 = 'bannable'
-arg4 = 'cringe'
-arg5 = 'gilf worthy'
-arg6 = 'interesting'
+# initialize items
+for i in range(6):
+    if f'arg{i}' not in st.session_state:
+        st.session_state[f'arg{i}'] = defArgs[i]
+if 'username' not in st.session_state:
+    st.session_state['username'] = ""
+
+def resetInput():
+    st.session_state['username'] = ""
+    for i in range(6):
+        st.session_state['val' + str(i)] = 0
 
 with st.sidebar:
-    div = st.empty()
+    useTab, editTab = st.tabs(["Use", "Edit"])
 
-    if st.button('reset'):
-        st.session_state.username = ""
-        st.session_state.val1 = 0
-        st.session_state.val2 = 0
-        st.session_state.val3 = 0
-        st.session_state.val4 = 0
-        st.session_state.val5 = 0
-        st.session_state.val6 = 0
+    # handles use mode
+    sliderDiv = useTab.empty();
+    if useTab.button('reset', use_container_width=True):
+        resetInput()
+    with sliderDiv.container():
+        st.text_input('Username', key='username')
+        for i in range(6):
+            st.slider(st.session_state[f'arg{i}'], 0, 10, key='val' + str(i))
 
-    with div.container():
-        name = st.text_input(label='Username', key='username')
-        val1 = st.slider(arg1, 0, 10, key='val1')
-        val2 = st.slider(arg2, 0, 10, key='val2')
-        val3 = st.slider(arg3, 0, 10, key='val3')
-        val4 = st.slider(arg4, 0, 10, key='val4')
-        val5 = st.slider(arg5, 0, 10, key='val5')
-        val6 = st.slider(arg6, 0, 10, key='val6')
+    # handles edit mode
+    with editTab:
+        for i in range(6):
+            st.text_input(' ',value=st.session_state[f'arg{i}'], key=f'arg{i}')
 
+data = {'r':[st.session_state['val' + str(i)] for i in range(6)],
+        'theta':[st.session_state[f'arg{i}'] for i in range(6)]}
 
-data = {'r':[val1, val2, val3, val4, val5, val6],
-        'theta':[arg1, arg2, arg3, arg4, arg5, arg6]}
-
-
-fig = px.line_polar(data, r=data['r'], theta=data['theta'], title='<span style="font-size: 50px;">' + name + '</span>', line_close=True, template='plotly_dark', width=1000, height=700,range_r=[0,10])
-
+fig = px.line_polar(data, r=data['r'], theta=data['theta'], 
+                    title='<span style="font-size: 50px;">' + st.session_state['username'] + '</span>', 
+                    line_close=True, template='plotly_dark', width=1000, height=700, range_r=[0,10])
 
 fig.update_traces(fill='toself')
 fig.update_layout(font=dict(
-        family='Open Sans',
-        size=20,
-        color='white'
-))
-
-fig.update_layout(
-    margin=dict(l=100, r=100, t=100, b=1),
+    family='Open Sans',
+    size=20,
+    color='white'),
+    margin=dict(l=100, r=100, t=100, b=1)
 )
 
 st.plotly_chart(fig, use_container_width=True)
